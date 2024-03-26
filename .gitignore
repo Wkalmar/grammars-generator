@@ -1,3 +1,7 @@
 src/generator/bin/Debug/net8.0/FSharp.Core.dll
 src/generator/bin/
 src/generator/obj/
+src/generator.tests/bin/
+src/generator.tests/obj/
+src/generator/.vs/
+src/.vs/
