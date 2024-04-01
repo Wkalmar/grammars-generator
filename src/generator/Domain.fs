@@ -102,8 +102,37 @@ let generateProgression (initialChord: HarmonyItem) (length: int) : HarmonyItem 
             generate nextChord (remaining - 1) (nextChord :: progression)
     generate initialChord (length - 1) [initialChord]
 
+type Pitch = {
+    midiNote: int
+    duration: float
+}
+
 let createChordFromRootNote rootNote item =
     let itemValue = getHarmonyItemValue item
     match (itemValue.value, itemValue.chordQuality) with
-    | (value, Major) -> [rootNote + value; rootNote + value + 4; rootNote + value + 7]
-    | (value, Minor) -> [rootNote + value; rootNote + value + 3; rootNote + value + 7]
+    | (value, Major) -> [|
+        {
+            midiNote = rootNote + value
+            duration = 1.0
+        };
+        {
+            midiNote = rootNote + value + 4
+            duration = 0.125
+        };
+        {
+            midiNote = rootNote + value + 7
+            duration = 1.0
+        }|]
+    | (value, Minor) -> [|
+        {
+            midiNote = rootNote + value
+            duration = 1.0
+        };
+        {
+            midiNote = rootNote + value + 4
+            duration = 0.125
+        };
+        {
+            midiNote = rootNote + value + 7
+            duration = 1.0
+        }|]
