@@ -4,8 +4,9 @@
     <TargetFramework>net8.0</TargetFramework>
   </PropertyGroup>
   <ItemGroup>
-    <Compile Include="Utils.fs" />
     <Compile Include="Domain.fs" />
+    <Compile Include="PrintUtils.fs" />
+    <Compile Include="Utils.fs" />
     <Compile Include="Program.fs" />
   </ItemGroup>
 </Project>

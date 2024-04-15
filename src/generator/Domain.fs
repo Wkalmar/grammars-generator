@@ -72,7 +72,7 @@ let regenerateHarmonyTransitionProbability currentHarmonyItem =
     | Dominant ->
         [|
             { transition = Dublicate; coinThreshold = 0.1 };
-            { transition = Resolve; coinThreshold = 0.55 };
+            { transition = Resolve; coinThreshold = 0.9 };
             { transition = DecreaseTension; coinThreshold = 1.0 };
         |]
 
@@ -85,7 +85,6 @@ let applyCommand command chord =
     | Resolve -> resolve chord
 
 let rnd = Random()
-let roll = rnd.NextDouble()
 
 let generateNextChord currentChord coin =
     let probabilityMap = regenerateHarmonyTransitionProbability currentChord
@@ -97,7 +96,8 @@ let generateProgression (initialChord: HarmonyItem) (length: int) : HarmonyItem 
         if remaining = 0 then
             List.toArray (List.rev progression)
         else
-            let coin = roll
+            let coin = rnd.NextDouble()
+            Console.WriteLine(coin)
             let nextChord = generateNextChord currentChord coin
             generate nextChord (remaining - 1) (nextChord :: progression)
     generate initialChord (length - 1) [initialChord]
