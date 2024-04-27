@@ -109,30 +109,53 @@ type Pitch = {
 
 let createChordFromRootNote rootNote item =
     let itemValue = getHarmonyItemValue item
-    match (itemValue.value, itemValue.chordQuality) with
-    | (value, Major) -> [|
+    let chord =
+        match (itemValue.value, itemValue.chordQuality) with
+        | (value, Major) -> [|
+            {
+                midiNote = rootNote + value
+                duration = 0.25
+            };
+            {
+                midiNote = rootNote + value + 4
+                duration = 0.25
+            };
+            {
+                midiNote = rootNote + value + 7
+                duration = 0.25
+            }|]
+        | (value, Minor) -> [|
+            {
+                midiNote = rootNote + value
+                duration = 0.25
+            };
+            {
+                midiNote = rootNote + value + 4
+                duration = 0.25
+            };
+            {
+                midiNote = rootNote + value + 7
+                duration = 0.25
+            }|]
+    match item with
+    | Tonic -> [|
         {
-            midiNote = rootNote + value
+            midiNote = chord.[0].midiNote
             duration = 1.0
         };
         {
-            midiNote = rootNote + value + 4
-            duration = 0.125
+            midiNote = chord.[1].midiNote
+            duration = 1.0
         };
         {
-            midiNote = rootNote + value + 7
+            midiNote = chord.[2].midiNote
             duration = 1.0
         }|]
-    | (value, Minor) -> [|
+    | Dominant -> [|
         {
-            midiNote = rootNote + value
+            midiNote = chord.[0].midiNote
             duration = 1.0
         };
-        {
-            midiNote = rootNote + value + 4
-            duration = 0.125
-        };
-        {
-            midiNote = rootNote + value + 7
-            duration = 1.0
-        }|]
+        chord.[1];
+        chord.[2]|]
+    | _ -> chord

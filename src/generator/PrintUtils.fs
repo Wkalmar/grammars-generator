@@ -2,15 +2,24 @@ module PrintUtils
 
 open Domain
 
-let formatPitch (pitch: Pitch) =
+let formatMidiNote pitch =
     sprintf "%d" pitch.midiNote
 
-let formatArray (pitches: Pitch array) =
-    "[" + String.concat ", " (Array.map formatPitch pitches) + "]"
+let formatDuration pitch =
+    sprintf "%f" pitch.duration
+
+let formatArray pitches formatFunction =
+    "[" + String.concat ", " (Array.map formatFunction pitches) + "]"
+
+let formatMidiNoteArray pitches =
+    formatArray pitches formatMidiNote
+
+let formatDurationArray pitches =
+    formatArray pitches formatDuration
 
 let formatDoubleArray (pitches: Pitch array array) =
   let pitchLists =
     pitches
-    |> Array.map formatArray
+    |> Array.map formatMidiNoteArray
 
   "[" + String.concat ",\n" pitchLists + "]"
