@@ -8,6 +8,8 @@ type ChordQuality =
 
 type HarmonyItem =
     | Tonic
+    | TonicSubstitute1
+    | TonicSubstitute2
     | SubDominant
     | Dominant
 
@@ -19,6 +21,8 @@ type HarmonyItemValue = {
 let getHarmonyItemValue item =
     match item with
     | Tonic -> { value = 0; chordQuality = Major }
+    | TonicSubstitute1 -> { value = 9; chordQuality = Minor }
+    | TonicSubstitute2 -> { value = 4; chordQuality = Minor }
     | SubDominant -> { value = 5; chordQuality = Major }
     | Dominant -> { value = 7; chordQuality = Major }
 
@@ -27,7 +31,11 @@ type HarmonyTransition =
     | IncreaseTension
     | MaximizeTension
     | DecreaseTension
+    | DecreaseTensionToFisrtSubstitute
+    | DecreaseTensionToSecondSubstitute
     | Resolve
+    | ResolveToFirstSubstitute
+    | ResolveToSecondSubstitute
 
 let dublicate harmonyItem =
     harmonyItem
@@ -35,13 +43,32 @@ let dublicate harmonyItem =
 let increaseTension harmonyItem =
     match harmonyItem with
     | Tonic -> SubDominant
+    | TonicSubstitute1 -> SubDominant
+    | TonicSubstitute2 -> SubDominant
     | SubDominant -> Dominant
     | Dominant -> Dominant
 
 let decreaseTension harmonyItem =
     match harmonyItem with
     | Tonic -> Tonic
+    | TonicSubstitute1 -> Tonic
+    | TonicSubstitute2 -> Tonic
     | SubDominant -> Tonic
+    | Dominant -> SubDominant
+let decreaseTensionToFisrtSubstitute harmonyItem =
+    match harmonyItem with
+    | Tonic -> TonicSubstitute1
+    | TonicSubstitute1 -> TonicSubstitute1
+    | TonicSubstitute2 -> TonicSubstitute1
+    | SubDominant -> TonicSubstitute1
+    | Dominant -> SubDominant
+
+let decreaseTensionToSecondSubstitute harmonyItem =
+    match harmonyItem with
+    | Tonic -> TonicSubstitute1
+    | TonicSubstitute1 -> TonicSubstitute2
+    | TonicSubstitute2 -> TonicSubstitute2
+    | SubDominant -> TonicSubstitute2
     | Dominant -> SubDominant
 
 let maximizeTension harmonyItem =
@@ -49,6 +76,12 @@ let maximizeTension harmonyItem =
 
 let resolve harmonyItem =
     Tonic
+
+let resolveToFirstSubstitute harmonyItem =
+    TonicSubstitute1
+
+let resolveToSecondSubstitute harmonyItem =
+    TonicSubstitute2
 
 type HarmonyTransitionProbability = {
     transition: HarmonyTransition
@@ -63,15 +96,31 @@ let regenerateHarmonyTransitionProbability currentHarmonyItem =
             { transition = IncreaseTension; coinThreshold = 0.55 };
             { transition = MaximizeTension; coinThreshold = 1.0 };
         |]
+    | TonicSubstitute1 ->
+        [|
+            { transition = Dublicate; coinThreshold = 0.1 };
+            { transition = IncreaseTension; coinThreshold = 0.55 };
+            { transition = MaximizeTension; coinThreshold = 1.0 };
+        |]
+    | TonicSubstitute2 ->
+        [|
+            { transition = Dublicate; coinThreshold = 0.1 };
+            { transition = IncreaseTension; coinThreshold = 0.55 };
+            { transition = MaximizeTension; coinThreshold = 1.0 };
+        |]
     | SubDominant ->
         [|
             { transition = Dublicate; coinThreshold = 0.1 };
             { transition = IncreaseTension; coinThreshold = 0.55 };
+            { transition = ResolveToFirstSubstitute; coinThreshold = 0.65 };
+            { transition = ResolveToSecondSubstitute; coinThreshold = 0.75 };
             { transition = Resolve; coinThreshold = 1.0 };
         |]
     | Dominant ->
         [|
             { transition = Dublicate; coinThreshold = 0.1 };
+            { transition = ResolveToFirstSubstitute; coinThreshold = 0.3 };
+            { transition = ResolveToSecondSubstitute; coinThreshold = 0.5 };
             { transition = Resolve; coinThreshold = 0.9 };
             { transition = DecreaseTension; coinThreshold = 1.0 };
         |]
@@ -81,8 +130,12 @@ let applyCommand command chord =
     | Dublicate -> dublicate chord
     | IncreaseTension -> increaseTension chord
     | DecreaseTension -> decreaseTension chord
+    | DecreaseTensionToFisrtSubstitute -> decreaseTensionToFisrtSubstitute chord
+    | DecreaseTensionToSecondSubstitute -> decreaseTensionToSecondSubstitute chord
     | MaximizeTension -> maximizeTension chord
     | Resolve -> resolve chord
+    | ResolveToFirstSubstitute -> resolveToFirstSubstitute chord
+    | ResolveToSecondSubstitute -> resolveToSecondSubstitute chord
 
 let rnd = Random()
 
@@ -130,7 +183,7 @@ let createChordFromRootNote rootNote item =
                 duration = 0.25
             };
             {
-                midiNote = rootNote + value + 4
+                midiNote = rootNote + value + 3
                 duration = 0.25
             };
             {
@@ -145,16 +198,23 @@ let createChordFromRootNote rootNote item =
         };
         {
             midiNote = chord.[1].midiNote
-            duration = 1.0
+            duration = 0.5
         };
         {
             midiNote = chord.[2].midiNote
-            duration = 1.0
+            duration = 0.5
         }|]
+    | TonicSubstitute2 -> [|
+        {
+            midiNote = chord.[0].midiNote
+            duration = 0.5
+        };
+        chord.[1];
+        chord.[2]|]
     | Dominant -> [|
         {
             midiNote = chord.[0].midiNote
-            duration = 1.0
+            duration = 0.5
         };
         chord.[1];
         chord.[2]|]
