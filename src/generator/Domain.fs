@@ -14,7 +14,6 @@ type HarmonyItem =
     | SubDominant
     | SubDominantSubstitute
     | Dominant
-    | DominantSubstitute
 
 type HarmonyItemValue = {
     value: int
@@ -29,14 +28,12 @@ let getHarmonyItemValue item =
     | SubDominant -> { value = 5; chordQuality = Major }
     | SubDominantSubstitute -> { value = 2; chordQuality = Minor }
     | Dominant -> { value = 7; chordQuality = Major }
-    | DominantSubstitute -> { value = 11; chordQuality = Diminished }
 
 type HarmonyTransition =
     | Dublicate
     | IncreaseTension
     | IncreaseTensionToSubstitute
     | MaximizeTension
-    | MaximizeTensionToSubstitute
     | DecreaseTension
     | DecreaseTensionToSubstitute
     | Resolve
@@ -54,18 +51,15 @@ let increaseTension harmonyItem =
     | SubDominant -> Dominant
     | SubDominantSubstitute -> Dominant
     | Dominant -> Dominant
-    | DominantSubstitute -> Dominant
 
 let increaseTensionToSubstitute harmonyItem =
     match harmonyItem with
     | Tonic -> SubDominantSubstitute
     | TonicSubstitute1 -> SubDominantSubstitute
     | TonicSubstitute2 -> SubDominantSubstitute
-    | SubDominant -> DominantSubstitute
-    | SubDominantSubstitute -> DominantSubstitute
-    | Dominant -> DominantSubstitute
-    | DominantSubstitute -> DominantSubstitute
-
+    | SubDominant -> Dominant
+    | SubDominantSubstitute -> Dominant
+    | Dominant -> Dominant
 
 let decreaseTension harmonyItem =
     match harmonyItem with
@@ -75,7 +69,7 @@ let decreaseTension harmonyItem =
     | SubDominant -> Tonic
     | SubDominantSubstitute -> Tonic
     | Dominant -> SubDominant
-    | DominantSubstitute -> SubDominant
+
 let decreaseTensionToSubstitute harmonyItem =
     match harmonyItem with
     | Tonic -> TonicSubstitute1
@@ -84,13 +78,9 @@ let decreaseTensionToSubstitute harmonyItem =
     | SubDominant -> TonicSubstitute1
     | SubDominantSubstitute -> TonicSubstitute1
     | Dominant -> SubDominantSubstitute
-    | DominantSubstitute -> SubDominantSubstitute
 
 let maximizeTension harmonyItem =
     Dominant
-
-let maximizeTensionToSubstitute harmonyItem =
-    DominantSubstitute
 
 let resolve harmonyItem =
     Tonic
@@ -177,7 +167,6 @@ let applyCommand command chord =
     | DecreaseTension -> decreaseTension chord
     | DecreaseTensionToSubstitute -> decreaseTensionToSubstitute chord
     | MaximizeTension -> maximizeTension chord
-    | MaximizeTensionToSubstitute -> maximizeTensionToSubstitute chord
     | Resolve -> resolve chord
     | ResolveToFirstSubstitute -> resolveToFirstSubstitute chord
     | ResolveToSecondSubstitute -> resolveToSecondSubstitute chord
