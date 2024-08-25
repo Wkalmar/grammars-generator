@@ -5,7 +5,9 @@ open System
 type ChordQuality =
     | Major
     | Minor
-    | Diminished
+    | Major7
+    | Dominant7
+    | Minor7
 
 type HarmonyItem =
     | Tonic
@@ -22,12 +24,12 @@ type HarmonyItemValue = {
 
 let getHarmonyItemValue item =
     match item with
-    | Tonic -> { value = 0; chordQuality = Major }
-    | TonicSubstitute1 -> { value = 9; chordQuality = Minor }
-    | TonicSubstitute2 -> { value = 4; chordQuality = Minor }
-    | SubDominant -> { value = 5; chordQuality = Major }
-    | SubDominantSubstitute -> { value = 2; chordQuality = Minor }
-    | Dominant -> { value = 7; chordQuality = Major }
+    | Tonic -> { value = 0; chordQuality = Major7 }
+    | TonicSubstitute1 -> { value = 9; chordQuality = Minor7 }
+    | TonicSubstitute2 -> { value = 4; chordQuality = Minor7 }
+    | SubDominant -> { value = 5; chordQuality = Major7 }
+    | SubDominantSubstitute -> { value = 2; chordQuality = Minor7 }
+    | Dominant -> { value = 7; chordQuality = Dominant7 }
 
 type HarmonyTransition =
     | Dublicate
@@ -149,15 +151,6 @@ let regenerateHarmonyTransitionProbability currentHarmonyItem =
             { transition = DecreaseTensionToSubstitute; coinThreshold = 0.95 };
             { transition = DecreaseTension; coinThreshold = 1.0 };
         |]
-    | DominantSubstitute ->
-        [|
-            { transition = Dublicate; coinThreshold = 0.1 };
-            { transition = ResolveToFirstSubstitute; coinThreshold = 0.3 };
-            { transition = ResolveToSecondSubstitute; coinThreshold = 0.5 };
-            { transition = Resolve; coinThreshold = 0.9 };
-            { transition = DecreaseTensionToSubstitute; coinThreshold = 0.95 };
-            { transition = DecreaseTension; coinThreshold = 1.0 };
-        |]
 
 let applyCommand command chord =
     match command with
@@ -224,7 +217,41 @@ let createChordFromRootNote rootNote item =
                 midiNote = rootNote + value + 7
                 duration = 0.25
             }|]
-        | (value, Diminished) -> [|
+        | (value, Dominant7) -> [|
+            {
+                midiNote = rootNote + value
+                duration = 0.25
+            };
+            {
+                midiNote = rootNote + value + 4
+                duration = 0.25
+            };
+            {
+                midiNote = rootNote + value + 7
+                duration = 0.25
+            };
+            {
+                midiNote = rootNote + value + 10
+                duration = 0.25
+            }|]
+        | (value, Major7) -> [|
+            {
+                midiNote = rootNote + value
+                duration = 0.25
+            };
+            {
+                midiNote = rootNote + value + 4
+                duration = 0.25
+            };
+            {
+                midiNote = rootNote + value + 7
+                duration = 0.25
+            };
+            {
+                midiNote = rootNote + value + 11
+                duration = 0.25
+            }|]
+        | (value, Minor7) -> [|
             {
                 midiNote = rootNote + value
                 duration = 0.25
@@ -234,35 +261,40 @@ let createChordFromRootNote rootNote item =
                 duration = 0.25
             };
             {
-                midiNote = rootNote + value + 6
+                midiNote = rootNote + value + 7
+                duration = 0.25
+            };
+            {
+                midiNote = rootNote + value + 10
                 duration = 0.25
             }|]
-    match item with
-    | Tonic -> [|
-        {
-            midiNote = chord.[0].midiNote
-            duration = 1.0
-        };
-        {
-            midiNote = chord.[1].midiNote
-            duration = 0.5
-        };
-        {
-            midiNote = chord.[2].midiNote
-            duration = 0.5
-        }|]
-    | TonicSubstitute2 -> [|
-        {
-            midiNote = chord.[0].midiNote
-            duration = 0.5
-        };
-        chord.[1];
-        chord.[2]|]
-    | Dominant -> [|
-        {
-            midiNote = chord.[0].midiNote
-            duration = 0.5
-        };
-        chord.[1];
-        chord.[2]|]
-    | _ -> chord
+    chord
+    // match item with
+    // | Tonic -> [|
+    //     {
+    //         midiNote = chord.[0].midiNote
+    //         duration = 1.0
+    //     };
+    //     {
+    //         midiNote = chord.[1].midiNote
+    //         duration = 0.5
+    //     };
+    //     {
+    //         midiNote = chord.[2].midiNote
+    //         duration = 0.5
+    //     }|]
+    // | TonicSubstitute2 -> [|
+    //     {
+    //         midiNote = chord.[0].midiNote
+    //         duration = 0.5
+    //     };
+    //     chord.[1];
+    //     chord.[2]|]
+    // | Dominant -> [|
+    //     {
+    //         midiNote = chord.[0].midiNote
+    //         duration = 0.5
+    //     };
+    //     chord.[1];
+    //     chord.[2]|]
+    // | _ -> chord

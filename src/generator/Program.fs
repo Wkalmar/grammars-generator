@@ -9,8 +9,8 @@ let main argv =
     let items =
         generateProgression HarmonyItem.Tonic 80
         |> Array.map (createChordFromRootNote 57)
-        |> duplicate
-        |> duplicate
+        //|> duplicate
+        //|> duplicate
         //|> duplicateWithReverse
         //|> Array.map (fun chord -> Utils.shuffle chord)
         //|> Array.collect (fun chord -> chord)
