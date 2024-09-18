@@ -5,9 +5,20 @@ open System
 type ChordQuality =
     | Major
     | Minor
-    | Major7
-    | Dominant7
-    | Minor7
+
+type Alteration =
+    | Ninth
+    | Eleventh
+    | Thirteenth
+
+let rnd = Random()
+
+let randomAlteration () =
+    match rnd.Next(3) with
+    | 0 -> Ninth
+    | 1 -> Eleventh
+    | _ -> Thirteenth
+
 
 type HarmonyItem =
     | Tonic
@@ -20,16 +31,17 @@ type HarmonyItem =
 type HarmonyItemValue = {
     value: int
     chordQuality: ChordQuality
+    alteration: Alteration
 }
 
 let getHarmonyItemValue item =
     match item with
-    | Tonic -> { value = 0; chordQuality = Major7 }
-    | TonicSubstitute1 -> { value = 9; chordQuality = Minor7 }
-    | TonicSubstitute2 -> { value = 4; chordQuality = Minor7 }
-    | SubDominant -> { value = 5; chordQuality = Major7 }
-    | SubDominantSubstitute -> { value = 2; chordQuality = Minor7 }
-    | Dominant -> { value = 7; chordQuality = Dominant7 }
+    | Tonic -> { value = 0; chordQuality = Major; alteration = randomAlteration () }
+    | TonicSubstitute1 -> { value = 9; chordQuality = Minor; alteration = randomAlteration ()  }
+    | TonicSubstitute2 -> { value = 4; chordQuality = Minor; alteration = randomAlteration ()  }
+    | SubDominant -> { value = 5; chordQuality = Major; alteration = randomAlteration ()  }
+    | SubDominantSubstitute -> { value = 2; chordQuality = Minor; alteration = randomAlteration ()  }
+    | Dominant -> { value = 7; chordQuality = Major; alteration = randomAlteration ()  }
 
 type HarmonyTransition =
     | Dublicate
@@ -164,8 +176,6 @@ let applyCommand command chord =
     | ResolveToFirstSubstitute -> resolveToFirstSubstitute chord
     | ResolveToSecondSubstitute -> resolveToSecondSubstitute chord
 
-let rnd = Random()
-
 let generateNextChord currentChord coin =
     let probabilityMap = regenerateHarmonyTransitionProbability currentChord
     let command = (Array.filter (fun x -> coin <= x.coinThreshold) probabilityMap).[0].transition
@@ -217,58 +227,45 @@ let createChordFromRootNote rootNote item =
                 midiNote = rootNote + value + 7
                 duration = 0.25
             }|]
-        | (value, Dominant7) -> [|
-            {
-                midiNote = rootNote + value
-                duration = 0.25
-            };
-            {
-                midiNote = rootNote + value + 4
-                duration = 0.25
-            };
-            {
-                midiNote = rootNote + value + 7
-                duration = 0.25
-            };
-            {
-                midiNote = rootNote + value + 10
-                duration = 0.25
-            }|]
-        | (value, Major7) -> [|
-            {
-                midiNote = rootNote + value
-                duration = 0.25
-            };
-            {
-                midiNote = rootNote + value + 4
-                duration = 0.25
-            };
-            {
-                midiNote = rootNote + value + 7
-                duration = 0.25
-            };
+    let atleredChotd =
+        match (itemValue.value, itemValue.alteration) with
+        | (value, Ninth) -> [|
+            chord.[0];
+            chord.[1];
+            chord.[2];
             {
                 midiNote = rootNote + value + 11
                 duration = 0.25
-            }|]
-        | (value, Minor7) -> [|
+            };
             {
-                midiNote = rootNote + value
+                midiNote = rootNote + value + 14
+                duration = 0.25
+            }; |]
+        | (value, Eleventh) -> [|
+            chord.[0];
+            chord.[1];
+            chord.[2];
+            {
+                midiNote = rootNote + value + 11
                 duration = 0.25
             };
             {
-                midiNote = rootNote + value + 3
+                midiNote = rootNote + value + 17
+                duration = 0.25
+            }; |]
+        | (value, Thirteenth) -> [|
+            chord.[0];
+            chord.[1];
+            chord.[2];
+            {
+                midiNote = rootNote + value + 11
                 duration = 0.25
             };
             {
-                midiNote = rootNote + value + 7
+                midiNote = rootNote + value + 21
                 duration = 0.25
-            };
-            {
-                midiNote = rootNote + value + 10
-                duration = 0.25
-            }|]
-    chord
+            }; |]
+    atleredChotd
     // match item with
     // | Tonic -> [|
     //     {
