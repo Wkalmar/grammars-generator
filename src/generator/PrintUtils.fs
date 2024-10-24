@@ -5,6 +5,9 @@ open Domain
 let formatMidiNote pitch =
     sprintf "%d" pitch.midiNote
 
+let formatIntNote pitch =
+    sprintf "%d" pitch
+
 let formatDuration pitch =
     sprintf "%f" pitch.duration
 
@@ -13,6 +16,9 @@ let formatArray pitches formatFunction =
 
 let formatMidiNoteArray pitches =
     formatArray pitches formatMidiNote
+
+let formatIntNoteArray notes =
+    formatArray notes formatIntNote
 
 let formatDurationArray pitches =
     formatArray pitches formatDuration

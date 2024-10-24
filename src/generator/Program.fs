@@ -7,16 +7,18 @@ open PrintUtils
 [<EntryPoint>]
 let main argv =
     let items =
-        generateProgression HarmonyItem.Tonic 80
+        generateProgression HarmonyItem.Tonic 160
         |> Array.map (createChordFromRootNote 57)
         //|> duplicate
         //|> duplicate
         //|> duplicateWithReverse
         //|> Array.map (fun chord -> Utils.shuffle chord)
-        //|> Array.collect (fun chord -> chord)
+        |> Array.collect (fun chord -> chord)
+        |> Array.map (fun note -> note.midiNote)
+        |> Array.map (fun note -> applyOctaveShift note)
         // |> Array.iter(fun pitch -> Console.WriteLine("Note: " + pitch.midiNote.ToString() + " Duration: " + pitch.duration.ToString()))
-    let string = formatDoubleArray items
-    //let notes = formatMidiNoteArray items
+    //let string = formatDoubleArray items
+    let notes = formatIntNoteArray items
     //let durations = formatDurationArray items
     Console.ReadLine() |> ignore
     0

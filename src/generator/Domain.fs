@@ -298,3 +298,21 @@ let createChordFromRootNote rootNote item =
     //     chord.[1];
     //     chord.[2]|]
     // | _ -> chord
+
+
+type OctaveShift = {
+    shift: int
+    coinThreshold: double
+}
+let octaveShiftProbabilityMap = [|
+            { shift = 0; coinThreshold = 0.5 };
+            { shift = 1; coinThreshold = 0.7 };
+            { shift = -1; coinThreshold = 0.9 };
+            { shift = -2; coinThreshold = 1.0 };
+|]
+
+let applyOctaveShift midiNote =
+    let coin = rnd.NextDouble()
+    let shift =
+        (Array.filter (fun x -> coin <= x.coinThreshold) octaveShiftProbabilityMap).[0].shift
+    midiNote + (shift * 12)
