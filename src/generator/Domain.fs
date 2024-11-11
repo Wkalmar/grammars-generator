@@ -20,11 +20,11 @@ type HarmonyItemValue = {
 
 let getHarmonyItemValue item =
     match item with
-    | Tonic -> { value = 0; chordQuality = Major }
-    | TonicSubstitute1 -> { value = 9; chordQuality = Minor }
-    | TonicSubstitute2 -> { value = 4; chordQuality = Minor }
-    | SubDominant -> { value = 5; chordQuality = Major }
-    | Dominant -> { value = 7; chordQuality = Major }
+    | Tonic -> { value = 0; chordQuality = Minor }
+    | TonicSubstitute1 -> { value = 9; chordQuality = Major }
+    | TonicSubstitute2 -> { value = 4; chordQuality = Major }
+    | SubDominant -> { value = 5; chordQuality = Minor }
+    | Dominant -> { value = 7; chordQuality = Minor }
 
 type HarmonyTransition =
     | Dublicate

@@ -7,8 +7,8 @@ open PrintUtils
 [<EntryPoint>]
 let main argv =
     let items =
-        generateProgression HarmonyItem.Tonic 80
-        |> Array.map (createChordFromRootNote 64)
+        generateProgression HarmonyItem.Tonic 360
+        |> Array.map (createChordFromRootNote 62)
         //|> duplicate
         //|> duplicateWithReverse
         |> Array.map (fun chord -> Utils.shuffle chord)
